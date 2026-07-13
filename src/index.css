@@ -1,0 +1,426 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* ─────────────────────────────────────────────
+       SPIDER-MAN COMIC THEME — Red / Blue / Ink Black
+       (primary & accent are re-applied at runtime from
+        src/lib/themeSettings.ts — keep them in sync)
+       ───────────────────────────────────────────── */
+    --background: 240 24% 6%;
+    --foreground: 240 20% 98%;
+
+    --card: 240 22% 9%;
+    --card-foreground: 240 20% 98%;
+
+    --popover: 240 22% 9%;
+    --popover-foreground: 240 20% 98%;
+
+    --primary: 356 77% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 240 20% 13%;
+    --secondary-foreground: 240 20% 98%;
+
+    --muted: 240 16% 17%;
+    --muted-foreground: 240 10% 66%;
+
+    --accent: 221 83% 53%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 240 18% 20%;
+    --input: 240 18% 20%;
+    --ring: 356 77% 50%;
+
+    --radius: 0.75rem;
+
+    /* Custom Design Tokens */
+    --gradient-primary: linear-gradient(135deg, hsl(356 82% 52%) 0%, hsl(342 84% 42%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(221 83% 55%) 0%, hsl(199 90% 55%) 100%);
+    --gradient-spidey: linear-gradient(135deg, hsl(356 82% 52%) 0%, hsl(221 83% 55%) 100%);
+    --gradient-hero: radial-gradient(120% 90% at 50% 0%, hsl(356 60% 12%) 0%, hsl(240 26% 6%) 55%, hsl(240 30% 4%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(240 22% 12% / 0.6) 0%, hsl(240 24% 7% / 0.6) 100%);
+
+    --shadow-glow: 0 0 60px hsl(356 77% 50% / 0.25);
+    --shadow-card: 0 25px 50px -12px hsl(0 0% 0% / 0.6);
+
+    /* Comic ink outline used on panels/cards */
+    --comic-ink: 0 0% 3%;
+
+    --noise-opacity: 0.02;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  /* Hide cursor only on main portfolio, not admin */
+  body:not(.admin-panel) * {
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor-dot {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 8px;
+    height: 8px;
+    background: hsl(var(--primary));
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease, width 0.2s ease, height 0.2s ease;
+  }
+
+  .cursor-outline {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 35px;
+    height: 35px;
+    border: 2px solid hsl(var(--primary) / 0.5);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.15s ease-out, width 0.2s ease, height 0.2s ease, border-color 0.2s ease;
+  }
+
+  .cursor-glow {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 60px;
+    height: 60px;
+    background: radial-gradient(circle, hsl(var(--primary) / 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9997;
+    transform: translate(-50%, -50%);
+    transition: transform 0.2s ease-out;
+  }
+
+  /* Hide cursor on touch devices and mobile */
+  @media (hover: none),
+  (pointer: coarse),
+  (max-width: 768px) {
+    * {
+      cursor: auto !important;
+    }
+
+    .cursor-dot,
+    .cursor-outline,
+    .cursor-glow {
+      display: none !important;
+      pointer-events: none !important;
+    }
+  }
+
+  html {
+    scroll-behavior: auto;
+    /* Let Lenis handle scrolling */
+  }
+
+  /* Hardware acceleration for 120fps smoothness */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    background-color: hsl(var(--background));
+    background-image:
+      var(--gradient-hero),
+      /* faint spider-web radial lines */
+      repeating-radial-gradient(circle at 50% -10%, transparent 0 38px, hsl(0 0% 100% / 0.014) 38px 39px),
+      /* halftone comic dots */
+      radial-gradient(hsl(0 0% 100% / 0.02) 1px, transparent 1.4px);
+    background-size: 100% 100%, 100% 100%, 22px 22px;
+    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    @apply bg-primary/40 text-foreground;
+  }
+
+  /* Comic-book web scrollbar */
+  ::-webkit-scrollbar { width: 10px; }
+  ::-webkit-scrollbar-track { background: hsl(240 24% 5%); }
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(hsl(var(--primary)), hsl(var(--accent)));
+    border-radius: 999px;
+    border: 2px solid hsl(240 24% 5%);
+  }
+}
+
+@layer components {
+  .noise-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: var(--noise-opacity);
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  }
+
+  /* Disable noise overlay on mobile for better performance */
+  @media (max-width: 768px) {
+    .noise-overlay {
+      display: none;
+    }
+
+    /* Disable floating animations on mobile */
+    .animate-float {
+      animation: none !important;
+    }
+
+    /* Reduce blur effects on mobile for better performance */
+    [class*="blur-"] {
+      filter: none !important;
+    }
+  }
+
+  .glass-card {
+    @apply bg-card/50 backdrop-blur-xl border rounded-2xl;
+    border-color: hsl(var(--primary) / 0.18);
+    box-shadow: var(--shadow-card), inset 0 1px 0 hsl(0 0% 100% / 0.04);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .glass-card:hover {
+    border-color: hsl(var(--primary) / 0.4);
+    box-shadow: var(--shadow-card), 0 0 40px hsl(var(--primary) / 0.12);
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-primary);
+    padding-bottom: 0.1em;
+  }
+
+  .text-gradient-spidey {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-spidey);
+    padding-bottom: 0.1em;
+  }
+
+  /* Comic panel — thick ink border + hard offset shadow */
+  .comic-panel {
+    border: 3px solid hsl(var(--comic-ink));
+    box-shadow: 6px 6px 0 hsl(var(--comic-ink)), 0 0 0 1px hsl(var(--primary) / 0.4);
+  }
+
+  /* Halftone dot texture block */
+  .halftone {
+    background-image: radial-gradient(hsl(var(--primary) / 0.25) 1.2px, transparent 1.4px);
+    background-size: 10px 10px;
+  }
+
+  /* Comic display font utility */
+  .font-comic {
+    font-family: "Bangers", "Syne", system-ui, sans-serif;
+    letter-spacing: 0.04em;
+  }
+
+  .text-gradient-accent {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-accent);
+  }
+
+  .glow-effect {
+    box-shadow: var(--shadow-glow);
+  }
+
+  .hover-lift {
+    @apply transition-all duration-500 ease-out;
+  }
+
+  .hover-lift:hover {
+    @apply -translate-y-2;
+    box-shadow: 0 30px 60px -15px hsl(0 0% 0% / 0.6);
+  }
+
+  .link-underline {
+    @apply relative;
+  }
+
+  .link-underline::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-full h-0.5 bg-primary scale-x-0 origin-right transition-transform duration-300;
+  }
+
+  .link-underline:hover::after {
+    @apply scale-x-100 origin-left;
+  }
+
+  .section-padding {
+    @apply py-24 md:py-32 lg:py-40;
+  }
+
+  .container-custom {
+    @apply max-w-6xl mx-auto px-6 md:px-8;
+  }
+}
+
+@layer utilities {
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+
+  .animation-delay-600 {
+    animation-delay: 600ms;
+  }
+
+  /* Hide scrollbar but keep scroll functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari, Opera */
+  }
+}
+
+/* Keyframe Animations */
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes pulse-glow {
+
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.8s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.5s ease-out forwards;
+}
+
+/* Reduced Motion Support - Respects user's accessibility preferences */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .animate-float,
+  .animate-pulse-glow,
+  .animate-slide-up,
+  .animate-fade-in,
+  .animate-scale-in {
+    animation: none !important;
+  }
+
+  /* Disable cursor animations for reduced motion */
+  .cursor-dot,
+  .cursor-outline,
+  .cursor-glow {
+    display: none !important;
+  }
+
+  /* Simplify noise overlay */
+  .noise-overlay {
+    opacity: 0.01 !important;
+  }
+}
